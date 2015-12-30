@@ -8,6 +8,7 @@ use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
 use ParagonIE\Halite\Asymmetric;
+use Sodium\hex2bin;
 
 class AsymmetricEncryptionContext implements Context, SnippetAcceptingContext
 {
@@ -24,11 +25,11 @@ class AsymmetricEncryptionContext implements Context, SnippetAcceptingContext
     protected $cipherText;
     
     /**
-     * @Given My private key is:
+     * @Given My private key is :arg1
      */
-    public function myPrivateKeyIs(PyStringNode $privateKey)
+    public function myPrivateKeyIs($privateKey)
     {
-        $this->ownPrivateKey = new Asymmetric\EncryptionSecretKey((string) $privateKey);
+        $this->ownPrivateKey = new Asymmetric\EncryptionSecretKey(hex2bin($privateKey));
     }
     
     /**
@@ -36,15 +37,15 @@ class AsymmetricEncryptionContext implements Context, SnippetAcceptingContext
      */
     public function iHaveMyPublicKey()
     {
-        $this->ownPublicKey = $this->ownPrivateKey->derivatePublicKey();
+        $this->ownPublicKey = $this->ownPrivateKey->derivePublicKey();
     }
 
     /**
-     * @Given The other party's private key is:
+     * @Given The other party's private key is :arg1
      */
-    public function theOtherPartysPrivateKeyIs(PyStringNode $privateKey)
+    public function theOtherPartysPrivateKeyIs($privateKey)
     {
-        $this->otherPartyPrivateKey = new Asymmetric\EncryptionSecretKey((string) $privateKey);
+        $this->otherPartyPrivateKey = new Asymmetric\EncryptionSecretKey(hex2bin($privateKey));
     }
     
     /**
@@ -64,11 +65,11 @@ class AsymmetricEncryptionContext implements Context, SnippetAcceptingContext
     }
     
     /**
-     * @Given I have a ciphertext message of :arg1
+     * @Given I have a ciphertext message of:
      */
-    public function iHaveACiphertextMessageOf($cipherText)
+    public function iHaveACiphertextMessageOf(PyStringNode $cipherText)
     {
-        $this->cipherText = $cipherText;
+        $this->cipherText = str_replace(["\n", " "], '', (string) $cipherText);
     }
 
     /**
